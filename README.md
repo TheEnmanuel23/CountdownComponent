@@ -1,2 +1,0 @@
-# CountdownComponent
-Created with CodeSandbox
