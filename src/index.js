@@ -4,33 +4,39 @@ import ReactDOM from "react-dom";
 import "./styles.css";
 
 class CountdownTimer extends React.Component {
-  state = { totalHours: 4, hours: 0, minutes: 0, seconds: 0 };
+  state = { hours: 0, minutes: 0, seconds: 0 };
   intervalHandle;
 
   componentWillMount = () => this.increase();
 
   increase = () => {
     this.setState(({ hours }) => ({ hours: hours + 1 }));
-    this.setInterval = setInterval(this.other, 1000);
+    this.intervalHandle = setInterval(this.tick, 1000);
   };
 
-  other = () => {
-    const { firstDate, totalHours } = this.props;
+  tick = () => {
+    const { firstDate, totalHoursMax } = this.props;
 
     const countDownDate = new Date(firstDate).getTime();
     const now = new Date().getTime();
 
     const distance = now - countDownDate;
-    const hours = Math.floor(
+    const elapsedHours = Math.floor(
       (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
     );
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    const elapsedMinutes = Math.floor(
+      (distance % (1000 * 60 * 60)) / (1000 * 60)
+    );
+    const elapsedSeconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-    this.setState({
-      hours: totalHours - hours,
-      minutes: 60 - minutes,
-      seconds: 60 - seconds
+    const hours = totalHoursMax - elapsedHours;
+    const minutes = 60 - elapsedMinutes;
+    const seconds = 60 - elapsedSeconds;
+
+    this.setState({ hours, minutes, seconds }, () => {
+      if ((hours === 0) & (minutes === 0) & (seconds === 1)) {
+        clearInterval(this.intervalHandle);
+      }
     });
   };
 
@@ -45,15 +51,13 @@ class CountdownTimer extends React.Component {
   }
 }
 
-// get hours between start date and current date
-
 function App() {
   return (
     <div className="App">
       <h1>Hello CodeSandbox</h1>
       <h2>Start editing to see some magic happen!</h2>
       <CountdownTimer
-        totalHours={120}
+        totalHoursMax={4}
         firstDate="2018-12-19T16:41:15.063+00:00"
       />
     </div>
